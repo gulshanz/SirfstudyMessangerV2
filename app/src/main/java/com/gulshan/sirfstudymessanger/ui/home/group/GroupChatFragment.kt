@@ -5,56 +5,83 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.gulshan.sirfstudymessanger.R
+import com.gulshan.sirfstudymessanger.adapters.AllChatsAdapter
+import com.gulshan.sirfstudymessanger.databinding.FragmentChatBinding
+import com.gulshan.sirfstudymessanger.databinding.FragmentGroupChatBinding
+import com.gulshan.sirfstudymessanger.network.response.chats.SingleChatItem
+import com.gulshan.sirfstudymessanger.repository.ChatRepository
+import com.gulshan.sirfstudymessanger.util.Resource
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [GroupChatFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class GroupChatFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    lateinit var binding: FragmentChatBinding
+    lateinit var viewModel: GroupChatViewModel
+    lateinit var chatsAdapter: AllChatsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_group_chat, container, false)
+        binding = FragmentChatBinding.inflate(layoutInflater)
+        return binding.root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment GroupChatFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            GroupChatFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val chatRepository = ChatRepository()
+        val viewModelProviderFactory = GroupChatViewModelProviderFactory(chatRepository)
+        viewModel =
+            ViewModelProvider(this, viewModelProviderFactory)[GroupChatViewModel::class.java]
+        setupRV()
+        initData()
+    }
+
+    private fun initData() {
+        viewModel.groupChatList.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Success -> {
+                    response.data?.let {
+                        chatsAdapter.differ.submitList(response.data.data)
+                    }
+                }
+                is Resource.Error -> {
+
+                }
+                is Resource.Loading -> {
+
                 }
             }
+        }
     }
+
+    private fun setupRV() {
+        chatsAdapter = AllChatsAdapter()
+        binding.rvChat.apply {
+            adapter = chatsAdapter
+            layoutManager = LinearLayoutManager(activity)
+        }
+
+        chatsAdapter.setOnItemClickListener {
+            navigateToIndividualChat(it)
+
+        }
+    }
+
+    private fun navigateToIndividualChat(it: SingleChatItem) {
+        val bundle = Bundle().apply {
+            putSerializable("selectedChatItem", it)
+        }
+        findNavController().navigate(R.id.action_groupChatFragment_to_chatScreen, bundle)
+    }
+
+
 }

@@ -1,8 +1,6 @@
-package com.gulshan.sirfstudymessanger.network.response.chats
+package com.gulshan.sirfstudymessanger.network.response.group_chat
 
-import java.io.Serializable
-
-data class DetailsX(
+data class Details(
     val album_count: String,
     val followers_count: String,
     val following_count: String,
@@ -10,4 +8,4 @@ data class DetailsX(
     val likes_count: String,
     val mutual_friends_count: Int,
     val post_count: String
-):Serializable
+)

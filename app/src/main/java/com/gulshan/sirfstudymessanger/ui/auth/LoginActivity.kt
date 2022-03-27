@@ -1,21 +1,16 @@
 package com.gulshan.sirfstudymessanger.ui.auth
 
-import SharedPref
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.ViewModelStore
 import com.gulshan.sirfstudymessanger.R
 import com.gulshan.sirfstudymessanger.databinding.ActivityMainBinding
+import com.gulshan.sirfstudymessanger.repository.AuthRepository
 import com.gulshan.sirfstudymessanger.ui.home.BaseActivity
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     lateinit var viewModel: AuthViewModel
@@ -25,7 +20,9 @@ class LoginActivity : AppCompatActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        viewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        val authRepository = AuthRepository()
+        val viewModelProviderFactory = AuthViewModelProviderFactory(authRepository)
+        viewModel = ViewModelProvider(this, viewModelProviderFactory)[AuthViewModel::class.java]
         binding.viewmodel = viewModel
         binding.lifecycleOwner = this
 
@@ -34,7 +31,7 @@ class LoginActivity : AppCompatActivity() {
 
     }
 
-    fun init() {
+    private fun init() {
         observe()
         binding.apply {
             buttonLogin.setOnClickListener {

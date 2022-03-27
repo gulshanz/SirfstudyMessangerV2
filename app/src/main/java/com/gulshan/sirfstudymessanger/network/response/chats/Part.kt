@@ -1,6 +1,8 @@
 package com.gulshan.sirfstudymessanger.network.response.chats
 
-data class MessageUser(
+import java.io.Serializable
+
+data class Part(
     val about: String,
     val active: String,
     val address: String,
@@ -14,7 +16,7 @@ data class MessageUser(
     val birth_privacy: String,
     val birthday: String,
     val city: String,
-    val city_id: String,
+    val city_id: Any,
     val confirm_followers: String,
     val country_id: String,
     val cover: String,
@@ -92,7 +94,7 @@ data class MessageUser(
     val share_my_location: String,
     val show_activities_privacy: String,
     val state: String,
-    val state_id: String,
+    val state_id: Any,
     val status: String,
     val timezone: String,
     val twitter: String,
@@ -114,4 +116,4 @@ data class MessageUser(
     val working_link: String,
     val youtube: String,
     val zip: String
-)
+):Serializable

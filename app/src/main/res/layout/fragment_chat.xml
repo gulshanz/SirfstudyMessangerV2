@@ -30,17 +30,5 @@
         app:layout_constraintTop_toBottomOf="@id/edit_search"
         tools:listitem="@layout/item_chat" />
 
-    <Button
-        android:id="@+id/temp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="65dp"
-        android:text="temp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rv_chat" />
-
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>

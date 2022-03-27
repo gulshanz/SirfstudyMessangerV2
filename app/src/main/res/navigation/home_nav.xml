@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_groupChatFragment_to_activeUsers"
             app:destination="@id/activeUsers" />
+        <action
+            android:id="@+id/action_groupChatFragment_to_chatScreen"
+            app:destination="@id/chatScreen" />
     </fragment>
     <fragment
         android:id="@+id/activeUsers"

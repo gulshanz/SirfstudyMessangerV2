@@ -1,29 +1,29 @@
 package com.gulshan.sirfstudymessanger.ui.home.chats
 
-import SharedPref.init
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.Navigation
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.gulshan.sirfstudymessanger.R
+import com.gulshan.sirfstudymessanger.adapters.AllChatsAdapter
 import com.gulshan.sirfstudymessanger.databinding.FragmentChatBinding
+import com.gulshan.sirfstudymessanger.network.response.chats.SingleChatItem
+import com.gulshan.sirfstudymessanger.repository.ChatRepository
 import com.gulshan.sirfstudymessanger.ui.chat.ChatScreen
+import com.gulshan.sirfstudymessanger.util.Resource
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [ChatFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ChatFragment : Fragment() {
     lateinit var binding: FragmentChatBinding
+    lateinit var viewModel: ChatViewModel
+    lateinit var chatsAdapter: AllChatsAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,13 +40,48 @@ class ChatFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val chatRepository = ChatRepository()
+        val viewModelProviderFactory = ChatViewModelProviderFactory(chatRepository)
+        viewModel = ViewModelProvider(this, viewModelProviderFactory)[ChatViewModel::class.java]
+        setupRV()
+
+        viewModel.chatList.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Success -> {
+                    response.data?.let {
+                        chatsAdapter.differ.submitList(response.data.data)
+                    }
+                }
+                is Resource.Error -> {
+
+                }
+                is Resource.Loading -> {
+
+                }
+            }
+        }
         initListeners()
     }
 
-    private fun initListeners() {
-        binding.temp.setOnClickListener {
-           startActivity(Intent(activity, ChatScreen::class.java))
+    private fun navigateToIndividualChat(it: SingleChatItem) {
+        val bundle = Bundle().apply {
+            putSerializable("selectedChatItem", it)
         }
+        findNavController().navigate(R.id.action_chatFragment_to_chatScreen, bundle)
+    }
+
+    private fun setupRV() {
+        chatsAdapter = AllChatsAdapter()
+        binding.rvChat.apply {
+            adapter = chatsAdapter
+            layoutManager = LinearLayoutManager(activity)
+        }
+        chatsAdapter.setOnItemClickListener {
+            navigateToIndividualChat(it)
+        }
+    }
+
+    private fun initListeners() {
     }
 
 

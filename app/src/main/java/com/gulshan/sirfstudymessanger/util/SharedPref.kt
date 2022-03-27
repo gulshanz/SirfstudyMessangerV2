@@ -1,35 +1,58 @@
 import android.content.Context
 import android.content.SharedPreferences
+import com.gulshan.sirfstudymessanger.util.Keys.Companion.PREFERENCE_AUTH_KEY
 
-object SharedPref{
-    private lateinit var prefs:SharedPreferences
-    private const val PREFS_NAME = "params"
+object SharedPref {
+    private const val NAME = "sirfstudyPreferences"
+    private const val MODE = Context.MODE_PRIVATE
+    private lateinit var preferences: SharedPreferences
+
+    private val IS_FIRST_RUN_PREF = Pair("is_first_run", false)
 
     fun init(context: Context) {
-        prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        preferences = context.getSharedPreferences(NAME, MODE)
     }
 
-    fun read(key: String, default: String): String? {
-        return prefs.getString(key, default)
+    /**
+     * SharedPreferences extension function, so we won't need to call edit() and apply()
+     * ourselves on every SharedPreferences operation.
+     */
+
+    private inline fun SharedPreferences.edit(operation: (SharedPreferences.Editor) -> Unit) {
+        val editor = edit()
+        operation(editor)
+        editor.apply()
     }
 
-    fun read(key: String, default: Long): Long {
-        return prefs.getLong(key, default)
-    }
+    var firstRun: Boolean
+        get() = preferences.getBoolean(IS_FIRST_RUN_PREF.first, IS_FIRST_RUN_PREF.second)
+        set(value) = preferences.edit() {
+            it.putBoolean(IS_FIRST_RUN_PREF.first, value)
+        }
 
-    fun write(key: String, value: String) {
-        val prefsEditor: SharedPreferences.Editor = prefs.edit()
-        with(prefsEditor) {
-            putString(key, value)
-            commit()
+    fun writeString(key: String, value: String) {
+        preferences.edit() {
+            it.putString(key, value)
         }
     }
 
-    fun write(key: String, value: Long) {
-        val prefsEditor: SharedPreferences.Editor = prefs.edit()
-        with(prefsEditor) {
-            putLong(key, value)
-            commit()
+    fun getString(key: String): String? {
+        return preferences.getString(key, "")
+    }
+
+    fun putInt(key: String, value: Int) {
+        preferences.edit() {
+            it.putInt(key, value)
         }
     }
+
+    fun getInt(key: String): Int {
+        return preferences.getInt(key, -1)
+    }
+
+    fun getAccessToken(): String? {
+        return preferences.getString(PREFERENCE_AUTH_KEY, "")
+    }
+
+
 }

@@ -9,16 +9,15 @@ import androidx.lifecycle.viewModelScope
 import com.gulshan.sirfstudymessanger.network.response.LoginResponse
 import com.gulshan.sirfstudymessanger.repository.AuthRepository
 import com.gulshan.sirfstudymessanger.util.Keys
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.gulshan.sirfstudymessanger.util.Keys.Companion.PREFERENCE_AUTH_KEY
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class AuthViewModel @Inject constructor(
+class AuthViewModel(
     private val repository: AuthRepository
 ) : ViewModel() {
 
+    val sharedPref = SharedPref
     val loginStatus: MutableLiveData<Boolean> = MutableLiveData()
     val loginResponse: MutableLiveData<Boolean> = MutableLiveData()
     val errorString: MutableLiveData<String> = MutableLiveData();
@@ -60,11 +59,11 @@ class AuthViewModel @Inject constructor(
     }
 
     private fun saveAccessToken(accessToken: String) {
-        SharedPref.write(Keys.PREFERENCE_AUTH_KEY, accessToken)
+        sharedPref.writeString(PREFERENCE_AUTH_KEY, accessToken)
     }
 
-    private fun checkIsLoggedIn(){
-        val accessKey = SharedPref.read(Keys.PREFERENCE_AUTH_KEY, "")
+    private fun checkIsLoggedIn() {
+        val accessKey = sharedPref.getAccessToken()
         if (accessKey.isNullOrEmpty()) {
             loginStatus.postValue(false)
         } else {

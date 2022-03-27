@@ -1,5 +1,7 @@
 package com.gulshan.sirfstudymessanger.network.response.chats
 
+import java.io.Serializable
+
 data class Details(
     val album_count: String,
     val followers_count: String,
@@ -8,4 +10,4 @@ data class Details(
     val likes_count: String,
     val mutual_friends_count: Int,
     val post_count: String
-)
+):Serializable
